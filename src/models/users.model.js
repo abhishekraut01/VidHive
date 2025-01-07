@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import bcryptjs from 'bcryptjs';
+import jwt from 'jsonwebtoken'; // Ensure jwt is imported
 
 const userSchema = new mongoose.Schema(
     {
@@ -77,28 +78,40 @@ userSchema.methods.isPasswordValid = async function (password) {
     return await bcryptjs.compare(password, this.password);
 };
 
-userSchema.methods.generateAccessToken(async function () {
-    return await jwt.sign({
-        _id : this._id,
-        username : this.username,
-        fullname: this.fullname,
-        email:this.email
-    },
-    process.env.ACCESS_TOKEN_SECRET,
-    {
-        expiresIn : process.env.ACCESS_TOKEN_EXPIRY
-    })
-})
+/**
+ * Method: Generate an access token for the user.
+ * @returns {String} - JWT access token.
+ */
+userSchema.methods.generateAccessToken = async function () {
+    return jwt.sign(
+        {
+            _id: this._id,
+            username: this.username,
+            fullName: this.fullName,
+            email: this.email,
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY, // e.g., '15m'
+        }
+    );
+};
 
-userSchema.methods.generateRefreshToken(async function () {
-    return await jwt.sign({
-        _id : this._id,
-    },
-    process.env.REFRESH_TOKEN_SECRET,
-    {
-        expiresIn : process.env.REFRESH_TOKEN_EXPIRY
-    })
-})
+/**
+ * Method: Generate a refresh token for the user.
+ * @returns {String} - JWT refresh token.
+ */
+userSchema.methods.generateRefreshToken = async function () {
+    return jwt.sign(
+        {
+            _id: this._id,
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY, // e.g., '7d'
+        }
+    );
+};
 
 // Create and export the User model
 const User = mongoose.model("User", userSchema);
