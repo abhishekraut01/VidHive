@@ -6,7 +6,6 @@
 - [Environment Variables](#environment-variables)
 - [Installation](#installation)
 - [Running the Project](#running-the-project)
-- [Project Structure](#project-structure)
 - [API Documentation](#api-documentation)
 - [Dependencies](#dependencies)
 
@@ -56,12 +55,12 @@ Follow these steps to set up the backend project:
 
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/your-username/your-repository.git
+   git clone https://github.com/Abhishekraut01/VidHive.git
    ```
 
 2. **Navigate to the Project Directory:**
    ```bash
-   cd your-repository
+   cd VidHive
    ```
 
 3. **Install Dependencies:**
