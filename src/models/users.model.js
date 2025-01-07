@@ -90,6 +90,16 @@ userSchema.methods.generateAccessToken(async function () {
     })
 })
 
+userSchema.methods.generateRefreshToken(async function () {
+    return await jwt.sign({
+        _id : this._id,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+        expiresIn : process.env.REFRESH_TOKEN_EXPIRY
+    })
+})
+
 // Create and export the User model
 const User = mongoose.model("User", userSchema);
 export default User;
