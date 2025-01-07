@@ -15,5 +15,11 @@ app.use(express.json({limit:"16kb"}))
 app.use(express.urlencoded({extended:true}))
 app.use(express.static("public"))
 
+//import all the router
+import userRouter from './routes/user.routes.js';
+
+//use all the routers
+app.use("/api/v1/users",userRouter)
+
 
 export default app;

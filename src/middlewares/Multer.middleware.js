@@ -5,7 +5,7 @@ import path from 'path';
 const storage = multer.diskStorage({
     // Define the destination folder for uploaded files
     destination: (req, file, cb) => {
-        const uploadPath = path.join(__dirname, 'uploads'); // Ensure this folder exists
+        const uploadPath = path.join(__dirname, 'temp'); // Ensure this folder exists
         cb(null, uploadPath);
     },
     // Define the file naming convention
