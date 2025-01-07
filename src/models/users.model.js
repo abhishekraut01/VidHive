@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
             lowercase: true,
             trim: true, // Ensures uniform email format and removes extra spaces
         },
-        fullname: {
+        fullName: {
             type: String,
             required: true,
             trim: true, // Removes leading/trailing whitespace
@@ -76,6 +76,19 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.isPasswordValid = async function (password) {
     return await bcryptjs.compare(password, this.password);
 };
+
+userSchema.methods.generateAccessToken(async function () {
+    return await jwt.sign({
+        _id : this._id,
+        username : this.username,
+        fullname: this.fullname,
+        email:this.email
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+        expiresIn : process.env.ACCESS_TOKEN_EXPIRY
+    })
+})
 
 // Create and export the User model
 const User = mongoose.model("User", userSchema);
