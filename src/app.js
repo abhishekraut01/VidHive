@@ -17,9 +17,13 @@ app.use(express.static("public"))
 
 //import all the router
 import userRouter from './routes/user.routes.js';
+import globalErrorHandler from './middlewares/globelErrorHandler.js';
 
 //use all the routers
 app.use("/api/v1/users",userRouter)
 
+
+
+app.use(globalErrorHandler)
 
 export default app;
