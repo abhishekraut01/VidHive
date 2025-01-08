@@ -1,11 +1,16 @@
 import multer from 'multer';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Recreate __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Configure storage engine for multer
 const storage = multer.diskStorage({
     // Define the destination folder for uploaded files
     destination: (req, file, cb) => {
-        const uploadPath = path.join(__dirname, 'temp'); // Ensure this folder exists
+        const uploadPath = path.join(__dirname, '../../public/temp'); // Ensure this folder exists
         cb(null, uploadPath);
     },
     // Define the file naming convention
@@ -25,4 +30,4 @@ const upload = multer({
     },
 });
 
-export default upload
+export default upload;
