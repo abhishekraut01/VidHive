@@ -1,17 +1,22 @@
 import { Router } from "express";
-const userRouter = Router()
 import { userSignup } from "../controllers/user.controller.js";
-import upload from "../middlewares/Multer.middleware.js";
+import upload from "../middlewares/Multer.middleware.js"; // Make sure this is correctly imported
 
-userRouter.route("/signup").post(upload.fields[
-    {
-        name: "avatar",
-        maxCount: 1,
-    },
-    {
-        name: "coverImage",
-        maxCount: 1,
-    }
-] , userSignup)
+const userRouter = Router();
 
-export default userRouter
+// Define the POST route for signup with multiple file fields
+userRouter.route("/signup").post(
+    upload.fields([
+        {
+            name: "avatar", // field name in the form
+            maxCount: 1,     // limit to one file
+        },
+        {
+            name: "coverImage", // another field name for the cover image
+            maxCount: 1,        // limit to one file
+        }
+    ]),
+    userSignup // your controller function to handle the signup process
+);
+
+export default userRouter;
