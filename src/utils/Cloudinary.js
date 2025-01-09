@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
-import fs from "fs/promises"; // Use the Promises API for async file system operations
+import fs from "fs"; // Use the Promises API for async file system operations
 
 // Configure Cloudinary credentials
 cloudinary.config({
@@ -25,7 +25,8 @@ const uploadOnCloudinary = async (localFilePath) => {
             resource_type: "auto", // Auto-detect the file type (image, video, etc.)
         });
 
-        console.log(`File successfully uploaded to Cloudinary: ${response.url}`);
+        // console.log(`File successfully uploaded to Cloudinary: ${response.url}`);
+        fs.unlinkSync(localFilePath);
         return response;
     } catch (error) {
         console.error("Error uploading file to Cloudinary:", error);
