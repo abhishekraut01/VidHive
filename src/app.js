@@ -17,7 +17,7 @@ app.use(express.static("public"))
 
 //import all the router
 import userRouter from './routes/user.routes.js';
-import globalErrorHandler from './middlewares/globelErrorHandler.js';
+import globalErrorHandler from './middlewares/globelErrorHandler.middleware.js';
 
 //use all the routers
 app.use("/api/v1/users",userRouter)
