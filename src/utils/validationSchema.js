@@ -13,5 +13,9 @@ export const loginValidationSchema = Zod.object({
     password: Zod.string().min(6, "Password must be at least 6 characters").max(100, "Password cannot exceed 100 characters"),
 });
 
+export const passwordValidationSchema = Zod.object({
+    oldPassword:  Zod.string().min(6, "Password must be at least 6 characters").max(100, "Password cannot exceed 100 characters"),
+    newPassword: Zod.string().min(6, "Password must be at least 6 characters").max(100, "Password cannot exceed 100 characters"),
+});
 
 

@@ -1,7 +1,6 @@
 import AppError from '../utils/AppError.js';
 import asyncHandler from '../utils/asyncHandler.js';
-import { signUpvalidationSchema } from '../utils/validationSchema.js';
-import { loginValidationSchema } from '../utils/validationSchema.js';
+import { passwordValidationSchema, signUpvalidationSchema , loginValidationSchema } from '../utils/validationSchema.js';
 import User from '../models/users.model.js';
 import uploadOnCloudinary from '../utils/Cloudinary.js';
 import ApiResponse from '../utils/ApiResponse.js';
@@ -240,4 +239,32 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 });
 
-export { userSignup, userLogin, userLogout, refreshAccessToken };
+const changePassword = asyncHandler(async (req, res) => {
+    const validationResponse = passwordValidationSchema.safeParse(req.body);
+
+    if (!validationResponse.success) {
+        throw new AppError("Password format is invalid", 409, validationResponse.error.errors);
+    }
+
+    const { oldPassword, newPassword } = validationResponse.data;
+
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+        throw new AppError("User not found", 404);
+    }
+
+    // Compare the old password with the one in the database
+    const isPasswordCorrect = await user.isPasswordValid(oldPassword);
+
+    if (!isPasswordCorrect) {
+        throw new AppError("Old password is invalid", 400);
+    }
+
+    user.password = newPassword;
+    await user.save({validateBeforeSave: false});
+
+    return res.status(200).json(new ApiResponse(200, "Password changed successfully"));
+});
+
+export { userSignup, userLogin, userLogout, refreshAccessToken ,changePassword};
