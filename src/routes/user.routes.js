@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { userLogin, userLogout, userSignup } from "../controllers/user.controller.js";
+import { refreshAccessToken, userLogin, userLogout, userSignup } from "../controllers/user.controller.js";
 import upload from "../middlewares/Multer.middleware.js"; // Make sure this is correctly imported
 import verityJWT from "../middlewares/Auth.middleware.js";
 
@@ -24,5 +24,7 @@ userRouter.route("/login").post(userLogin)
 
 //secured routes
 userRouter.route("/logout").post(verityJWT , userLogout)
+
+userRouter.route("/refresh-access-token").post(refreshAccessToken)
 
 export default userRouter;
