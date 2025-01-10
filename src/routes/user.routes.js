@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { userSignup } from "../controllers/user.controller.js";
+import { userLogin, userLogout, userSignup } from "../controllers/user.controller.js";
 import upload from "../middlewares/Multer.middleware.js"; // Make sure this is correctly imported
+import verityJWT from "../middlewares/Auth.middleware.js";
 
 const userRouter = Router();
 
@@ -18,5 +19,10 @@ userRouter.route("/signup").post(
     ]),
     userSignup // your controller function to handle the signup process
 );
+
+userRouter.route("/login").post(userLogin)
+
+//secured routes
+userRouter.route("/logout").post(verityJWT , userLogout)
 
 export default userRouter;

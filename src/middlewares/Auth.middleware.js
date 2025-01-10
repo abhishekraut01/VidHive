@@ -26,3 +26,5 @@ const verityJWT =asyncHandler( async (req,res,next) =>{
         throw new AppError("Invalid access token" , 401)
     }
 })
+
+export default verityJWT
