@@ -12,8 +12,8 @@ const generateAccessAndRefreshTokens = async (userId) => {
         if (!user) {
             throw new AppError("User not found", 404);
         }
-        const accessToken = user.generateAccessToken();
-        const refreshToken = user.generateRefreshToken();
+        const accessToken = await user.generateAccessToken();
+        const refreshToken = await user.generateRefreshToken();
 
         user.refreshToken = refreshToken;
         await user.save({ validateBeforeSave: false });
@@ -86,13 +86,13 @@ const userLogin = asyncHandler(async (req, res) => {
     const validationResult = loginValidationSchema.safeParse(req.body);
 
     if (!validationResult.success) {
-        throw new AppError("User input is invalid", 409);
+        throw new AppError("User input is invalid", 409 ,  validationResult.error.errors);
     }
 
     const { username, email, password } = validationResult.data;
 
     if (!username && !email) {
-        throw new AppError("Username or email is required", 409);
+        throw new AppError("Username or email is required", 409 );
     }
 
     if (!password) {
@@ -103,6 +103,7 @@ const userLogin = asyncHandler(async (req, res) => {
     const userExist = await User.findOne({
         $or: [{ username }, { email }]
     });
+    console.log(userExist)
 
     if (!userExist) {
         throw new AppError("User does not exist. Please signup first", 409);
@@ -110,6 +111,7 @@ const userLogin = asyncHandler(async (req, res) => {
 
     // Step 3: Check if the password is correct
     const isPasswordCorrect = await userExist.isPasswordValid(password);
+    console.log(isPasswordCorrect)
 
     if (!isPasswordCorrect) {
         throw new AppError("Password is incorrect", 401);
@@ -117,12 +119,11 @@ const userLogin = asyncHandler(async (req, res) => {
 
     // Step 4: Generate tokens
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(userExist._id);
-
-    // Step 5: Save the refresh token
-    userExist.refreshToken = refreshToken;
-    await userExist.save({ validateBeforeSave: false });
+    console.log(accessToken)
+    console.log(refreshToken)
 
     const userResponse = await User.findById(userExist._id).select("-password -refreshToken");
+    console.log(userResponse)
 
     const options = {
         secure: true,

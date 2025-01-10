@@ -1,6 +1,6 @@
-import User from "../models/users.model";
-import AppError from "../utils/AppError";
-import asyncHandler from "../utils/asyncHandler";
+import User from "../models/users.model.js";
+import AppError from "../utils/AppError.js";
+import asyncHandler from "../utils/asyncHandler.js";
 import jwt from 'jsonwebtoken'
 
 const verityJWT =asyncHandler( async (req,_ ,next) =>{
