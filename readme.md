@@ -8,6 +8,7 @@
 - [Running the Project](#running-the-project)
 - [API Documentation](#api-documentation)
 - [Dependencies](#dependencies)
+- [Backend model and schema ](https://app.eraser.io/workspace/Zi10EPuo91Yn4oiM0bJS)
 
 ---
 
