@@ -29,4 +29,6 @@ userRouter.route("/refresh-access-token").post(refreshAccessToken)
 
 userRouter.route("/changePassword").post(verityJWT,changePassword)
 
+userRouter.route("/getCurrentUser").post(verityJWT,getCurrentUser)
+
 export default userRouter;
