@@ -3,7 +3,7 @@ import AppError from "../utils/AppError";
 import asyncHandler from "../utils/asyncHandler";
 import jwt from 'jsonwebtoken'
 
-const verityJWT =asyncHandler( async (req,res,next) =>{
+const verityJWT =asyncHandler( async (req,_ ,next) =>{
     try {
         //Get token from cookies or authorization header
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer " , "")
@@ -21,6 +21,7 @@ const verityJWT =asyncHandler( async (req,res,next) =>{
        }
 
        req.user = user
+       next()
         
     } catch (error) {
         throw new AppError("Invalid access token" , 401)

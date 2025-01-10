@@ -1,4 +1,4 @@
-const globalErrorHandler = (err, req, res, next) => {
+const globalErrorHandler = (err, _ , res, next) => {
     console.error(err); // Log for debugging (can integrate with logging libraries like Winston)
 
     // Default values for errors
