@@ -3,6 +3,7 @@ import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken'; // Ensure jwt is imported
 
+
 const userSchema = new mongoose.Schema(
     {
         username: {
