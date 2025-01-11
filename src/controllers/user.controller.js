@@ -373,6 +373,44 @@ const updateAvatar = asyncHandler(async (req, res) => {
   );
 });
 
+const updateCoverImage = asyncHandler(async (req, res) => {
+  const coverImageLocalPath = req.file?.path;
+
+  if (!coverImageLocalPath) {
+    throw new AppError('coverImage is required', 400);
+  }
+
+  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+
+  if (!coverImage.url) {
+    throw new AppError('Failed to update coverImage', 500);
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        coverImage: coverImage.url,
+      },
+    },
+    { new: true }
+  ).select('-password -refreshToken');
+
+  if (!user) {
+    throw new AppError('User does not exist', 404);
+  }
+
+  res.status(200).json(
+    new ApiResponse(200, 'coverImage updated successfully', {
+      user: user.toObject({
+        getters: true,
+        virtuals: false,
+        versionKey: false,
+      }),
+    })
+  );
+});
+
 export {
   userSignup,
   userLogin,
