@@ -37,4 +37,6 @@ userRouter.route('/changePassword').post(verityJWT, changePassword);
 
 userRouter.route('/getCurrentUser').post(verityJWT, getCurrentUser);
 
+userRouter.route('/updateAccountDetails').post(verityJWT, updateAccountDetails);
+
 export default userRouter;

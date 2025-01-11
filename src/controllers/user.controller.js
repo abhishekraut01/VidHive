@@ -4,6 +4,7 @@ import {
   passwordValidationSchema,
   signUpvalidationSchema,
   loginValidationSchema,
+  updateDetailsValidationSchema,
 } from '../utils/validationSchema.js';
 import User from '../models/users.model.js';
 import uploadOnCloudinary from '../utils/Cloudinary.js';
@@ -52,6 +53,9 @@ const userSignup = asyncHandler(async (req, res) => {
 
   // Step 3: Handle avatar and cover image file uploads
   const avatarLocalPath = req.files?.avatar?.[0]?.path;
+  console.log(req.files);
+  console.log(req.files?.avatar);
+  console.log(req.files?.avatar?.[0]);
   const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
 
   if (!avatarLocalPath) {
@@ -286,8 +290,52 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-    
+  const validationResponse = updateDetailsValidationSchema.safeParse(req.body);
+
+  if (!validationResponse.success) {
+    throw new AppError(
+      'Input format is invalid',
+      409,
+      validationResponse.error.errors
+    );
+  }
+
+  // Extract user information
+  const { username, fullName, email } = validationResponse.data;
+
+  if (!(username || fullName || email)) {
+    throw new AppError('At least one field is required for update', 400);
+  }
+
+  // Database call for updating the user
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        username,
+        email,
+        fullName,
+      },
+    },
+    { new: true }
+  ).select('-password -refreshToken');
+
+  if (!updatedUser) {
+    throw new AppError('User not found', 404);
+  }
+
+  res.status(200).json(
+    new ApiResponse(200, 'User information updated successfully', {
+      user: updatedUser.toObject({
+        getters: true,
+        virtuals: false,
+        versionKey: false,
+      }),
+    })
+  );
 });
+
+
 
 export {
   userSignup,
@@ -296,4 +344,6 @@ export {
   refreshAccessToken,
   changePassword,
   getCurrentUser,
+  updateAccountDetails,
+  updateAvatar,
 };
