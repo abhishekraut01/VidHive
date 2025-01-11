@@ -9,6 +9,7 @@
 - [API Documentation](#api-documentation)
 - [Dependencies](#dependencies)
 - [Backend model and schema ](https://app.eraser.io/workspace/Zi10EPuo91Yn4oiM0bJS)
+- [project Front end figma file ](https://www.figma.com/design/shmxWL5FKRO5GNOPPopBg6/PLAY?node-id=1-38406&t=OFaSsyeTbcl9CSzc-0)
 
 ---
 
