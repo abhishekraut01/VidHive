@@ -335,7 +335,43 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
   );
 });
 
+const updateAvatar = asyncHandler(async (req, res) => {
+  const avatarLocalPath = req.file?.path;
 
+  if (!avatarLocalPath) {
+    throw new AppError('Avatar is required', 400);
+  }
+
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+  if (!avatar.url) {
+    throw new AppError('Failed to update avatar', 500);
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        avatar: avatar.url,
+      },
+    },
+    { new: true }
+  ).select('-password -refreshToken');
+
+  if (!user) {
+    throw new AppError('User does not exist', 404);
+  }
+
+  res.status(200).json(
+    new ApiResponse(200, 'Avatar updated successfully', {
+      user: user.toObject({
+        getters: true,
+        virtuals: false,
+        versionKey: false,
+      }),
+    })
+  );
+});
 
 export {
   userSignup,
