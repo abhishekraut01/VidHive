@@ -19,12 +19,12 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true, // Ensures uniform email format and removes extra spaces
+      index: true, // Improves search operations on fullname
     },
     fullName: {
       type: String,
       required: true,
       trim: true, // Removes leading/trailing whitespace
-      index: true, // Improves search operations on fullname
     },
     avatar: {
       type: String, // URL for the user's avatar image (uploaded via Cloudinary)
