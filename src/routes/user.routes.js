@@ -1,7 +1,13 @@
 import { Router } from 'express';
 import {
   changePassword,
+  getCurrentUser,
+  getUserChannelProfile,
+  getWatchHistory,
   refreshAccessToken,
+  updateAccountDetails,
+  updateAvatar,
+  updateCoverImage,
   userLogin,
   userLogout,
   userSignup,
@@ -38,5 +44,19 @@ userRouter.route('/changePassword').post(verityJWT, changePassword);
 userRouter.route('/getCurrentUser').post(verityJWT, getCurrentUser);
 
 userRouter.route('/updateAccountDetails').post(verityJWT, updateAccountDetails);
+
+userRouter
+  .route('/updateAvatar')
+  .patch(verityJWT, upload.single('avatar'), updateAvatar);
+
+userRouter
+  .route('/updateCoverImage')
+  .patch(verityJWT, upload.single('coverImage'), updateCoverImage);
+
+userRouter
+  .route('/getUserChannelProfile')
+  .get(verityJWT, getUserChannelProfile);
+
+userRouter.route('/getWatchHistory').get(verityJWT, getWatchHistory);
 
 export default userRouter;
