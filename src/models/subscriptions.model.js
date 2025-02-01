@@ -11,6 +11,6 @@ const subscriptionsSchema = mongoose.model({
   },
 },{createdAt:true});
 
-const Subscriptions = mongoose.model("Subscriptions" , subscriptionsSchema)
+const Subscription = mongoose.model("Subscription" , subscriptionsSchema)
 
-export default Subscriptions
+export default Subscription

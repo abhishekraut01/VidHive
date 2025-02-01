@@ -54,9 +54,9 @@ userRouter
   .patch(verityJWT, upload.single('coverImage'), updateCoverImage);
 
 userRouter
-  .route('/getUserChannelProfile')
+  .route('/c/:username')
   .get(verityJWT, getUserChannelProfile);
 
-userRouter.route('/getWatchHistory').get(verityJWT, getWatchHistory);
+userRouter.route('/history').get(verityJWT, getWatchHistory);
 
 export default userRouter;

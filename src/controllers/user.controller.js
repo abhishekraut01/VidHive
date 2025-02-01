@@ -54,9 +54,9 @@ const userSignup = asyncHandler(async (req, res) => {
 
   // Step 3: Handle avatar and cover image file uploads
   const avatarLocalPath = req.files?.avatar?.[0]?.path;
-  console.log(req.files);
-  console.log(req.files?.avatar);
-  console.log(req.files?.avatar?.[0]);
+  console.log('req.files output', req.files);
+  console.log('req.files?.avatar output', req.files?.avatar);
+  console.log('req.files?.avatar?.[0] output', req.files?.avatar?.[0]);
   const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
 
   if (!avatarLocalPath) {
@@ -174,7 +174,7 @@ const userLogout = asyncHandler(async (req, res) => {
     req.user?._id,
     {
       $set: {
-        refreshToken: undefined,
+        refreshToken: null,
       },
     },
     { new: true }
@@ -283,7 +283,7 @@ const changePassword = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user?._id);
+  const user = await User.findById(req.user?._id).select('-password');
 
   res
     .status(200)
@@ -413,19 +413,16 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 });
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
-  const { username } = req.params;
+  const username = req.params.username?.replace(/[^a-zA-Z0-9_-]/g, "").trim();
+  console.log('Decoded Username:', username);
 
-  if (!username?.trim()) {
-    throw new AppError('username is not provided', 400);
+  if (!username) {
+    throw new AppError('Username is not provided', 400);
   }
-
-  //creating aggregation pipelines
 
   const channel = await User.aggregate([
     {
-      $match: {
-        username: username?.trim(),
-      },
+      $match: { username },
     },
     {
       $lookup: {
@@ -445,18 +442,19 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     },
     {
       $addFields: {
-        subscriberCount: {
-          $size: '$subscribers',
-        },
-        userSubscribedToCount: {
-          $size: '$subscribedTo',
-        },
+        subscriberCount: { $size: '$subscribers' },
+        userSubscribedToCount: { $size: '$subscribedTo' },
         isSubscribed: {
-          $cond: {
-            if: { $in: [req.user?._id, '$subscribers.subscriber'] },
-            then: true,
-            else: false,
-          },
+          $in: [
+            req.user?._id,
+            {
+              $map: {
+                input: '$subscribers',
+                as: 'sub',
+                in: '$$sub.subscriber',
+              },
+            },
+          ],
         },
       },
     },
@@ -466,7 +464,6 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         avatar: 1,
         coverImage: 1,
         username: 1,
-        avatar: 1,
         subscriberCount: 1,
         userSubscribedToCount: 1,
         email: 1,
@@ -474,78 +471,72 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     },
   ]);
 
-  if (!channel?.length) {
-    throw new AppError('Channel does not exist');
+  console.log('Aggregation Result:', channel);
+
+  if (!channel.length) {
+    throw new AppError('Channel does not exist', 404);
   }
 
   return res
     .status(200)
-    .json(new ApiResponse(200, 'user profile fetched data', channel[0]));
+    .json(new ApiResponse(200, 'User profile fetched', channel[0]));
 });
 
 const getWatchHistory = asyncHandler(async (req, res) => {
-  //to get the user watch history we need to get his user id first
-  // req.user._id this will give us the string means the object id string , its mongoose feature that while searching we can convert this to objectId to search in database
+  const userId = req.user._id;
 
-  const user = User.aggregate([
-    //this pipeline will match match the user and we will get out sprecific user whom we are sending watch history
+  if (!userId) {
+    throw new AppError('User ID is required', 400);
+  }
+
+  const user = await User.aggregate([
     {
-      $match: {
-        _id: new mongoose.Types.ObjectId(req.user._id),
-      },
+      $match: { _id: new mongoose.Types.ObjectId(userId) },
     },
-
     {
       $lookup: {
         from: 'videos',
         localField: 'watchHistory',
         foreignField: '_id',
-        as: 'WatchHistory', //now here we have to put subpipeline so that owner field is not empty i mean owner field mai id na rahe balki data rahe
+        as: 'watchHistory',
         pipeline: [
           {
             $lookup: {
               from: 'users',
               localField: 'owner',
               foreignField: '_id',
-              as: 'owner', //at this state we will get the user data but there are many filed but we want selected one so we will create one more pipeline
-              pipeline:[
+              as: 'owner',
+              pipeline: [
                 {
-                  $addFields:{
-                    fullName:1,
-                    avatar:1,
-                    username:1
-                  }
-                }
-              ]
+                  $project: {
+                    fullName: 1,
+                    avatar: 1,
+                    username: 1,
+                  },
+                },
+              ],
             },
           },
           {
-            $addFields:{
-              owner:{
-                $first:"$owner"
-              }
-            }
-          }
+            $addFields: {
+              owner: { $first: '$owner' },
+            },
+          },
         ],
       },
     },
-
-
   ]);
 
-  if(!user){
-    throw new AppError
+  // Check if user exists
+  if (!user.length) {
+    throw new AppError('User not found', 404);
   }
 
   res
-  .status(200)
-  .json(
-    new ApiResponse(
-      200,
-      "Watch history fetched successfully",
-      user[0].watchHistory
-    )
-  )
+    .status(200)
+    .json(
+      new ApiResponse(200, 'Watch history fetched successfully', user[0].watchHistory)
+    );
 });
 
 export {
